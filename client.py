@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import copy
-from models import DNN 
+from models import DNN  # 반드시 필요
 
 class Client:
     def __init__(self, cid, model, train_loader, device,
@@ -72,9 +72,7 @@ class Client:
         return self.full_weights if self.full_weights is not None else self.model.state_dict()
 
     def expand_model_to_include_new_class(self, global_weights):
-        """
-        서버로부터 확장된 global model weight을 받아 6-class 모델로 확장
-        """
+        # 서버로부터 확장된 global model weight을 받아 6-class 모델로 확장
         current_output_dim = self.model.net[-1].out_features
         target_output_dim = global_weights["net.4.bias"].shape[0]
 
