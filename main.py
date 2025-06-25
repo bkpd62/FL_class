@@ -7,7 +7,8 @@ from data_loader import load_data
 from utils import (
     set_seed, evaluate_zeroday_accuracy,
     get_result_filepath, save_results_with_metadata,
-    analyze_zeroday_predictions  
+    analyze_zeroday_predictions,
+    print_confusion_matrix  
 )
 import time
 
@@ -103,6 +104,13 @@ def main():
         device=device,
         zeroday_class_index=zeroday_class_index - 1,  # zero-day class는 마지막 index
         label_map=label_map
+    )
+
+    print_confusion_matrix(
+    model=server.global_model,
+    dataloader=test_loader,
+    device=device,
+    label_map=label_map
     )
 
     timestamp = time.strftime("%Y%m%d_%H%M%S")
