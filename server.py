@@ -39,7 +39,6 @@ class Server:
 
             new_model.net[4].weight[:self.output_dim] = state_dict['net.4.weight']
             new_model.net[4].bias[:self.output_dim] = state_dict['net.4.bias']
-            # 나머지 1개 클래스는 랜덤 초기화 그대로
 
         self.global_model = new_model
         self.output_dim += 1
@@ -65,7 +64,7 @@ class Server:
 
                 else:
                     print(f"[Server] Post-zeroday aggregation for {key}")
-                    # 평균은 0 ~ (output_dim-2) 까지만 계산
+                    # 클래스 0부터 4는 평균을 구하고, 마지막 클래스는 client 0의 값을 사용
                     avg_all = torch.mean(stacked[:, :-1], dim=0)  # 일반 클래스 평균
                     # 마지막 클래스는 client 0의 값 사용
                     client0_value = client_weights[0][key][-1:].clone()  # 마지막 row
