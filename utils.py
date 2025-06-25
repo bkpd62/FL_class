@@ -6,7 +6,6 @@ import pandas as pd
 from datetime import datetime
 from sklearn.metrics import confusion_matrix
 
-
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
@@ -14,7 +13,6 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
 
 def evaluate_zeroday_accuracy(model, dataloader, device, zeroday_class_index):
     model.eval()
@@ -72,9 +70,7 @@ def print_confusion_matrix(y_true, y_pred, label_map):
 
 
 def expand_model_weights(old_state_dict, client0_state_dict):
-    """
-    기존 모델의 state_dict와 새로운 클래스의 state_dict를 결합하여 확장된 state_dict 생성.
-    """
+    # 기존 모델의 state_dict와 새로운 클래스의 state_dict를 결합하여 확장된 state_dict 생성
     new_state_dict = {}
     for k in old_state_dict:
         if k == 'net.4.weight':
@@ -117,3 +113,24 @@ def analyze_zeroday_predictions(model, dataloader, device, zeroday_class_index, 
         print(f"  → Predicted as {pred_label} ({label_name}): {count} samples")
 
     return pred_counter
+
+
+def print_confusion_matrix(model, dataloader, device, label_map):
+    model.eval()
+    y_true = []
+    y_pred = []
+
+    with torch.no_grad():
+        for x, y in dataloader:
+            x, y = x.to(device), y.to(device)
+            outputs = model(x)
+            preds = torch.argmax(outputs, dim=1)
+            y_true.extend(y.cpu().tolist())
+            y_pred.extend(preds.cpu().tolist())
+
+    cm = confusion_matrix(y_true, y_pred)
+    labels = [label_map[i] for i in range(len(label_map))]
+
+    print("\n[Confusion Matrix]")
+    print(pd.DataFrame(cm, index=labels, columns=labels))
+    return cm 
